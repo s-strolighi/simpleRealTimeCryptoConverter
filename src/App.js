@@ -36,31 +36,23 @@ const App = () => {
 
   const setValuesFromConversion = (main, amount) => {
     let allValuesUpdated = { ...allValues };
-    if(!fiatIdList.includesm(main)){
-      getValue(main).then(data => {
-        getValue(cryptoIdList[0]).then(currentCrypto0 => {
-          getValue(cryptoIdList[1]).then(currentCrypto1 => {
-            getValue(cryptoIdList[2]).then(currentCrypto2 => {
-              allValuesUpdated[cryptoIdList[0]] = (data.market_data.current_price["eur"] / currentCrypto0.market_data.current_price["eur"]) * amount
-              allValuesUpdated[cryptoIdList[1]] = (data.market_data.current_price["eur"] / currentCrypto1.market_data.current_price["eur"]) * amount
-              allValuesUpdated[cryptoIdList[2]] = (data.market_data.current_price["eur"] / currentCrypto2.market_data.current_price["eur"]) * amount
-              
-              allValuesUpdated.eur = data.market_data.current_price["eur"]*amount
-              allValuesUpdated.usd = data.market_data.current_price["usd"]*amount
-              
-              console.log(allValuesUpdated)
-              setAllValues(allValuesUpdated)
-            })
+    getValue(main).then(data => {
+      getValue(cryptoIdList[0]).then(currentCrypto0 => {
+        getValue(cryptoIdList[1]).then(currentCrypto1 => {
+          getValue(cryptoIdList[2]).then(currentCrypto2 => {
+            allValuesUpdated[cryptoIdList[0]] = (data.market_data.current_price["eur"] / currentCrypto0.market_data.current_price["eur"]) * amount
+            allValuesUpdated[cryptoIdList[1]] = (data.market_data.current_price["eur"] / currentCrypto1.market_data.current_price["eur"]) * amount
+            allValuesUpdated[cryptoIdList[2]] = (data.market_data.current_price["eur"] / currentCrypto2.market_data.current_price["eur"]) * amount
+
+            allValuesUpdated.eur = data.market_data.current_price["eur"] * amount
+            allValuesUpdated.usd = data.market_data.current_price["usd"] * amount
+
+            console.log(allValuesUpdated)
+            setAllValues(allValuesUpdated)
           })
         })
       })
-    }
-    else{
-      
-    }
-
-
-
+    })
   }
 
   return <>
