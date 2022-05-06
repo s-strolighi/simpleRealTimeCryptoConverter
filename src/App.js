@@ -47,7 +47,7 @@ const App = () => {
             allValuesUpdated.eur = data.market_data.current_price["eur"] * amount
             allValuesUpdated.usd = data.market_data.current_price["usd"] * amount
 
-            console.log(allValuesUpdated)
+            //console.log(allValuesUpdated)
             setAllValues(allValuesUpdated)
           })
         })
