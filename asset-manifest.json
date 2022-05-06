@@ -1,10 +1,13 @@
 {
   "files": {
+    "main.css": "/simpleRealTimeCryptoConverter/static/css/main.e7720ab7.css",
     "main.js": "/simpleRealTimeCryptoConverter/static/js/main.63c04ade.js",
     "index.html": "/simpleRealTimeCryptoConverter/index.html",
+    "main.e7720ab7.css.map": "/simpleRealTimeCryptoConverter/static/css/main.e7720ab7.css.map",
     "main.63c04ade.js.map": "/simpleRealTimeCryptoConverter/static/js/main.63c04ade.js.map"
   },
   "entrypoints": [
+    "static/css/main.e7720ab7.css",
     "static/js/main.63c04ade.js"
   ]
 }
