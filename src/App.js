@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Navbar, Container, Card, InputGroup, FormControl, Button } from "react-bootstrap";
+import logo from './logo512.png';
 
 const App = () => {
 
@@ -82,7 +83,16 @@ const App = () => {
   return <>
     <Navbar bg="primary" variant="dark">
       <Container>
-        <Navbar.Brand href="#home">Simple real time crypto converter</Navbar.Brand>
+        <Navbar.Brand>
+        <img
+          alt=""
+          src={logo}
+          width="50"
+          height="50"
+          className="d-inline-block"
+        />{' '}
+      Simple real time crypto converter
+      </Navbar.Brand>
       </Container>
     </Navbar>
 
