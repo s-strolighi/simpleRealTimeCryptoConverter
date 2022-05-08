@@ -14,6 +14,7 @@ const App = () => {
   const [mintValues, setMintValues] = useState({ "100": { "eur": 0, "sol": 0 }, "125": { "eur": 0, "sol": 0 } })
   const [levelCost, setLevelCost] = useState({ "5": { "eur": 0, "sol": 0 } })
 
+ 
 
   const getValue = async (from) => {
     return await fetch(url + from)
@@ -153,7 +154,7 @@ const App = () => {
         <div className="row">
           <div className="col-lg mb-3">
             
-                <h5>100/100 + level5 (GST+GMT) = <b>{customRound(mintValues[100].eur + levelCost[5].eur)}€</b> = <b>{customRound(mintValues[100].sol + levelCost[5].sol)}SOL</b></h5>
+                <h5>100/100 + level5 = <b>{customRound(mintValues[100].eur + levelCost[5].eur)}€</b> = <b>{customRound(mintValues[100].sol + levelCost[5].sol)}SOL</b></h5>
                 <b>Mint</b>: 100GST+100GMT = <b>{customRound(mintValues[100].eur)}€</b> = <b>{customRound(mintValues[100].sol)}SOL</b><br />
                 <b>Level5</b>: 20GST+10GMT = <b>{customRound(levelCost[5].eur)}€</b> = <b>{customRound(levelCost[5].sol)}SOL</b><br />
                             
@@ -162,6 +163,12 @@ const App = () => {
       </Card.Body>
     </Card>
   }
+
+
+  useState(() => {
+    updateMintStats();
+    handleChangeText('green-satoshi-token', 19);
+  }, [])
 
   return <>
     <Navbar bg="primary" variant="dark">
