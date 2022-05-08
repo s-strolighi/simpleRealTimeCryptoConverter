@@ -1,14 +1,14 @@
 {
   "files": {
-    "main.css": "/simpleRealTimeCryptoConverter/static/css/main.e7720ab7.css",
-    "main.js": "/simpleRealTimeCryptoConverter/static/js/main.bc10f7c6.js",
+    "main.css": "/simpleRealTimeCryptoConverter/static/css/main.b2538864.css",
+    "main.js": "/simpleRealTimeCryptoConverter/static/js/main.4fafd51c.js",
     "static/media/logo512.png": "/simpleRealTimeCryptoConverter/static/media/logo512.486e30cfdac6eb68d6f0.png",
     "index.html": "/simpleRealTimeCryptoConverter/index.html",
-    "main.e7720ab7.css.map": "/simpleRealTimeCryptoConverter/static/css/main.e7720ab7.css.map",
-    "main.bc10f7c6.js.map": "/simpleRealTimeCryptoConverter/static/js/main.bc10f7c6.js.map"
+    "main.b2538864.css.map": "/simpleRealTimeCryptoConverter/static/css/main.b2538864.css.map",
+    "main.4fafd51c.js.map": "/simpleRealTimeCryptoConverter/static/js/main.4fafd51c.js.map"
   },
   "entrypoints": [
-    "static/css/main.e7720ab7.css",
-    "static/js/main.bc10f7c6.js"
+    "static/css/main.b2538864.css",
+    "static/js/main.4fafd51c.js"
   ]
 }

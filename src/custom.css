@@ -1,0 +1,13 @@
+@media screen and (min-width: 200px) {
+    .mainContainer{
+        width: 99vw;
+    }
+  }
+
+@media screen and (min-width: 1200px) {
+    .mainContainer{
+        width: 80vw;
+    }
+  }
+  
+  
