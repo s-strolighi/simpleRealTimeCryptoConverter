@@ -3,18 +3,16 @@ import { Navbar, Container, Card, InputGroup, FormControl, Button } from "react-
 import logo from './logo512.png';
 
 const App = () => {
-
-
+  
   const url = "https://api.coingecko.com/api/v3/coins/"
 
   const cryptoIdList = ["green-satoshi-token", "stepn", "solana"]
   const fiatIdList = ["eur", "usd"]
+  const symbols = { 'green-satoshi-token': 'GST', 'stepn': 'GMT', 'solana': 'SOL' }
 
   const [allValues, setAllValues] = useState({})
   const [mintValues, setMintValues] = useState({ "100": { "eur": 0, "sol": 0 }, "125": { "eur": 0, "sol": 0 } })
   const [levelCost, setLevelCost] = useState({ "5": { "eur": 0, "sol": 0 } })
-
- 
 
   const getValue = async (from) => {
     return await fetch(url + from)
@@ -106,41 +104,6 @@ const App = () => {
     }
   }
 
-
-  function CardConversion() {
-    const symbols = { 'green-satoshi-token': 'GST', 'stepn': 'GMT', 'solana': 'SOL' }
-    return <Card className="mx-auto m-4">
-      <Card.Header as="h5">Real time converter</Card.Header>
-      <Card.Body>
-        <Card.Title className="mb-3">Select your crypto or change them</Card.Title>
-        <div className="row">
-          {
-            cryptoIdList.map((value, index) => {
-              return <div key={'crypto' + index} className="col-lg mb-3">
-                <InputGroup>
-                  <Button variant="outline-primary">{symbols[value]}</Button>
-                  <FormControl type='number' placeholder="insert" value={allValues[value] || ''} onChange={(e) => handleChangeText(value, e.target.value)} />
-                </InputGroup>
-              </div>
-            })
-          }
-          <hr />
-          {
-            fiatIdList.map((value, index) => {
-              return <div key={'fiat' + index} className="col-lg mb-3">
-                <InputGroup>
-                  <Button variant="outline-primary">{value.toUpperCase()}</Button>
-                  <FormControl type='number' placeholder="insert" value={allValues[value] || ''} onChange={(e) => handleChangeText(value, e.target.value)} />
-                </InputGroup>
-              </div>
-            })
-          }
-
-        </div>
-      </Card.Body>
-    </Card>
-  }
-
   function customRound(value) {
     return Math.round((value + Number.EPSILON) * 100) / 100
   }
@@ -153,17 +116,16 @@ const App = () => {
       <Card.Body>
         <div className="row">
           <div className="col-lg mb-3">
-            
-                <h5>100/100 + level5 = <b>{customRound(mintValues[100].eur + levelCost[5].eur)}€</b> = <b>{customRound(mintValues[100].sol + levelCost[5].sol)}SOL</b></h5>
-                <b>Mint</b>: 100GST+100GMT = <b>{customRound(mintValues[100].eur)}€</b> = <b>{customRound(mintValues[100].sol)}SOL</b><br />
-                <b>Level5</b>: 20GST+10GMT = <b>{customRound(levelCost[5].eur)}€</b> = <b>{customRound(levelCost[5].sol)}SOL</b><br />
-                            
+
+            <h5>100/100 + level5 = <b>{customRound(mintValues[100].eur + levelCost[5].eur)}€</b> = <b>{customRound(mintValues[100].sol + levelCost[5].sol)}SOL</b></h5>
+            <b>Mint</b>: 100GST+100GMT = <b>{customRound(mintValues[100].eur)}€</b> = <b>{customRound(mintValues[100].sol)}SOL</b><br />
+            <b>Level5</b>: 20GST+10GMT = <b>{customRound(levelCost[5].eur)}€</b> = <b>{customRound(levelCost[5].sol)}SOL</b><br />
+
           </div>
         </div>
       </Card.Body>
     </Card>
   }
-
 
   useState(() => {
     updateMintStats();
@@ -187,7 +149,36 @@ const App = () => {
     </Navbar>
     <div className="mx-auto row mainContainer">
       <div className="col-lg">
-        <CardConversion />
+        <Card className="mx-auto m-4">
+          <Card.Header as="h5">Real time converter</Card.Header>
+          <Card.Body>
+            <Card.Title className="mb-3">Select your crypto or change them</Card.Title>
+            <div className="row">
+              {
+                cryptoIdList.map((value, index) => {
+                  return <div key={'crypto' + index} className="col-lg mb-3">
+                    <InputGroup>
+                      <Button variant="outline-primary">{symbols[value]}</Button>
+                      <FormControl type='number' placeholder="insert" value={allValues[value] || ''} onChange={(e) => handleChangeText(value, e.target.value)} />
+                    </InputGroup>
+                  </div>
+                })
+              }
+              <hr />
+              {
+                fiatIdList.map((value, index) => {
+                  return <div key={'fiat' + index} className="col-lg mb-3">
+                    <InputGroup>
+                      <Button variant="outline-primary">{value.toUpperCase()}</Button>
+                      <FormControl type='number' placeholder="insert" value={allValues[value] || ''} onChange={(e) => handleChangeText(value, e.target.value)} />
+                    </InputGroup>
+                  </div>
+                })
+              }
+
+            </div>
+          </Card.Body>
+        </Card>
       </div>
       <div className="col-lg">
         <CardMinting />
