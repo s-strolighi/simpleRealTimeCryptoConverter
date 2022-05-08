@@ -3,7 +3,7 @@ import { Navbar, Container, Card, InputGroup, FormControl, Button } from "react-
 import logo from './logo512.png';
 
 const App = () => {
-  
+
   const url = "https://api.coingecko.com/api/v3/coins/"
 
   const cryptoIdList = ["green-satoshi-token", "stepn", "solana"]
@@ -114,14 +114,16 @@ const App = () => {
     return <Card className="mx-auto m-4">
       <Card.Header as="h5">Is minting worth?</Card.Header>
       <Card.Body>
-        <div className="row">
-          <div className="col-lg mb-3">
-
+      <div>
             <h5>100/100 + level5 = <b>{customRound(mintValues[100].eur + levelCost[5].eur)}€</b> = <b>{customRound(mintValues[100].sol + levelCost[5].sol)}SOL</b></h5>
             <b>Mint</b>: 100GST+100GMT = <b>{customRound(mintValues[100].eur)}€</b> = <b>{customRound(mintValues[100].sol)}SOL</b><br />
             <b>Level5</b>: 20GST+10GMT = <b>{customRound(levelCost[5].eur)}€</b> = <b>{customRound(levelCost[5].sol)}SOL</b><br />
-
-          </div>
+        </div>
+        <br/><br/>
+        <div>
+            <h5>125/125 + level5 = <b>{customRound(mintValues[125].eur + levelCost[5].eur)}€</b> = <b>{customRound(mintValues[125].sol + levelCost[5].sol)}SOL</b></h5>
+            <b>Mint</b>: 100GST+100GMT = <b>{customRound(mintValues[125].eur)}€</b> = <b>{customRound(mintValues[125].sol)}SOL</b><br />
+            <b>Level5</b>: 20GST+10GMT = <b>{customRound(levelCost[5].eur)}€</b> = <b>{customRound(levelCost[5].sol)}SOL</b><br />
         </div>
       </Card.Body>
     </Card>
