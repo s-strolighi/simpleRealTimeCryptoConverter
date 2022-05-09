@@ -161,7 +161,7 @@ const App = () => {
                   return <div key={'crypto' + index} className="col-lg mb-3">
                     <InputGroup>
                       <Button variant="outline-primary">{symbols[value]}</Button>
-                      <FormControl type='number' placeholder="insert" value={allValues[value] || ''} onChange={(e) => handleChangeText(value, e.target.value)} />
+                      <FormControl placeholder="insert" value={allValues[value] || ''} onChange={(e) => handleChangeText(value, e.target.value)} />
                     </InputGroup>
                   </div>
                 })
@@ -172,7 +172,7 @@ const App = () => {
                   return <div key={'fiat' + index} className="col-lg mb-3">
                     <InputGroup>
                       <Button variant="outline-primary">{value.toUpperCase()}</Button>
-                      <FormControl type='number' placeholder="insert" value={allValues[value] || ''} onChange={(e) => handleChangeText(value, e.target.value)} />
+                      <FormControl placeholder="insert" value={allValues[value] || ''} onChange={(e) => handleChangeText(value, e.target.value)} />
                     </InputGroup>
                   </div>
                 })
