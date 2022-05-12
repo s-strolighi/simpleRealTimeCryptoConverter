@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Navbar, Container, Card, InputGroup, FormControl, Button } from "react-bootstrap";
 import logo from './logo512.png';
 
@@ -8,10 +8,19 @@ const App = () => {
 
   const cryptoIdList = ["green-satoshi-token", "stepn", "solana"]
   const fiatIdList = ["eur", "usd"]
+  const [currentGstUsdPrice, setCurrentGstUsdPrice] = useState(1)
+
   const symbols = { 'green-satoshi-token': 'GST', 'stepn': 'GMT', 'solana': 'SOL' }
 
   const [allValues, setAllValues] = useState({})
-  const [mintValues, setMintValues] = useState({ "100": { "eur": 0, "sol": 0 }, "125": { "eur": 0, "sol": 0 } })
+  const [mintValues, setMintValues] = useState({
+    "200-0": { "eur": 0, "sol": 0 }, 
+    "160-40": { "eur": 0, "sol": 0 }, 
+    "120-80": { "eur": 0, "sol": 0 }, 
+    "100-100": { "eur": 0, "sol": 0 },
+    "80-120": { "eur": 0, "sol": 0 },
+    "40-160": { "eur": 0, "sol": 0 }
+  })
   const [levelCost, setLevelCost] = useState({ "5": { "eur": 0, "sol": 0 } })
 
   const getValue = async (from) => {
@@ -42,17 +51,25 @@ const App = () => {
     getValue('green-satoshi-token').then(GST => {
       getValue('stepn').then(GMT => {
         getValue('solana').then(SOL => {
-          mintValuesUpdated[100].eur = GST.market_data.current_price["eur"] * 100 + GMT.market_data.current_price["eur"] * 100
-          mintValuesUpdated[125].eur = GST.market_data.current_price["eur"] * 125 + GMT.market_data.current_price["eur"] * 125
+          let done = Object.keys(mintValues).every(value => {
+            let key = value
+            let gstAmount = parseInt(value.split("-")[0].trim())
+            let gmtAmount = parseInt(value.split("-")[1].trim())
 
-          mintValuesUpdated[100].sol = mintValuesUpdated[100].eur / SOL.market_data.current_price["eur"]
-          mintValuesUpdated[125].sol = mintValuesUpdated[125].eur / SOL.market_data.current_price["eur"]
+            mintValuesUpdated[key].eur = GST.market_data.current_price["eur"] * gstAmount + GMT.market_data.current_price["eur"] * gmtAmount
+            mintValuesUpdated[key].sol = mintValuesUpdated[key].eur / SOL.market_data.current_price["eur"]
 
-          levelCostUpdated[5].eur = GST.market_data.current_price["eur"] * 20 + GMT.market_data.current_price["eur"] * 10
-          levelCostUpdated[5].sol = levelCostUpdated[5].eur / SOL.market_data.current_price["eur"]
+            return true
+          })
 
-          setLevelCost(levelCostUpdated)
-          setMintValues(mintValuesUpdated)
+          if(done){
+            levelCostUpdated[5].eur = GST.market_data.current_price["eur"] * 20 + GMT.market_data.current_price["eur"] * 10
+            levelCostUpdated[5].sol = levelCostUpdated[5].eur / SOL.market_data.current_price["eur"]
+            
+            setLevelCost(levelCostUpdated)
+            setMintValues(mintValuesUpdated)
+            setCurrentGstUsdPrice(GST.market_data.current_price["usd"])
+          }
 
         })
       })
@@ -111,20 +128,51 @@ const App = () => {
 
   function CardMinting() {
     updateMintStats();
+    let key;
+    let message;
+    switch (true) {
+      case (currentGstUsdPrice < 2) : 
+        key = "200-0"
+        message = "GMT lower than 2 USD"
+        break;
+        case (currentGstUsdPrice < 3) : 
+        key = "160-40"
+        message = "GMT between 2 and 3 USD"
+        break;
+        case (currentGstUsdPrice < 4) : 
+        key = "120-80"
+        message = "GMT between 3 and 4 USD"
+        break;
+        case (currentGstUsdPrice < 8) : 
+        key = "100-100"
+        message = "GMT between 4 and 8 USD"
+        break;
+        case (currentGstUsdPrice < 10) : 
+        key = "80-120"
+        message = "GMT between 8 and 10 USD"
+        break;
+        case (currentGstUsdPrice > 10) : 
+        key = "40-160"
+        message = "GMT higher than 10 USD"
+        break;
+      default:
+        key="Error"
+        break;
+    }
+
+    let gstAmount = key.split('-')[0].trim()
+    let gmtAmount = key.split('-')[1].trim()
+    console.log(key)
     return <Card className="mx-auto m-4">
       <Card.Header as="h5">Is minting worth?</Card.Header>
       <Card.Body>
       <div>
-            <h5>100/100 + level5 = <b>{customRound(mintValues[100].eur + levelCost[5].eur)}€</b> = <b>{customRound(mintValues[100].sol + levelCost[5].sol)}SOL</b></h5>
-            <b>Mint</b>: 100GST+100GMT = <b>{customRound(mintValues[100].eur)}€</b> = <b>{customRound(mintValues[100].sol)}SOL</b><br />
+        <small className="text-muted">{message} - {currentGstUsdPrice} $</small>
+            <h5 className="mt-1">{key} + level5 = <b>{customRound(mintValues[key].eur + levelCost[5].eur)}€</b> = <b>{customRound(mintValues[key].sol + levelCost[5].sol)}SOL</b></h5>
+            <b>Mint</b>: {gstAmount}GST+{gmtAmount}GMT = <b>{customRound(mintValues[key].eur)}€</b> = <b>{customRound(mintValues[key].sol)}SOL</b><br />
             <b>Level5</b>: 20GST+10GMT = <b>{customRound(levelCost[5].eur)}€</b> = <b>{customRound(levelCost[5].sol)}SOL</b><br />
         </div>
         <br/><br/>
-        <div>
-            <h5>125/125 + level5 = <b>{customRound(mintValues[125].eur + levelCost[5].eur)}€</b> = <b>{customRound(mintValues[125].sol + levelCost[5].sol)}SOL</b></h5>
-            <b>Mint</b>: 100GST+100GMT = <b>{customRound(mintValues[125].eur)}€</b> = <b>{customRound(mintValues[125].sol)}SOL</b><br />
-            <b>Level5</b>: 20GST+10GMT = <b>{customRound(levelCost[5].eur)}€</b> = <b>{customRound(levelCost[5].sol)}SOL</b><br />
-        </div>
       </Card.Body>
     </Card>
   }
