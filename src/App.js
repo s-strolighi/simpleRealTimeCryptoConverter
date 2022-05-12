@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Navbar, Container, Card, InputGroup, FormControl, Button } from "react-bootstrap";
 import logo from './logo512.png';
 
@@ -8,15 +8,15 @@ const App = () => {
 
   const cryptoIdList = ["green-satoshi-token", "stepn", "solana"]
   const fiatIdList = ["eur", "usd"]
-  const [currentGstUsdPrice, setCurrentGstUsdPrice] = useState(1)
+  const [currentGstUsdPrice, setCurrentGstUsdPrice] = useState(0)
 
   const symbols = { 'green-satoshi-token': 'GST', 'stepn': 'GMT', 'solana': 'SOL' }
 
   const [allValues, setAllValues] = useState({})
   const [mintValues, setMintValues] = useState({
-    "200-0": { "eur": 0, "sol": 0 }, 
-    "160-40": { "eur": 0, "sol": 0 }, 
-    "120-80": { "eur": 0, "sol": 0 }, 
+    "200-0": { "eur": 0, "sol": 0 },
+    "160-40": { "eur": 0, "sol": 0 },
+    "120-80": { "eur": 0, "sol": 0 },
     "100-100": { "eur": 0, "sol": 0 },
     "80-120": { "eur": 0, "sol": 0 },
     "40-160": { "eur": 0, "sol": 0 }
@@ -62,10 +62,10 @@ const App = () => {
             return true
           })
 
-          if(done){
+          if (done) {
             levelCostUpdated[5].eur = GST.market_data.current_price["eur"] * 20 + GMT.market_data.current_price["eur"] * 10
             levelCostUpdated[5].sol = levelCostUpdated[5].eur / SOL.market_data.current_price["eur"]
-            
+
             setLevelCost(levelCostUpdated)
             setMintValues(mintValuesUpdated)
             setCurrentGstUsdPrice(GST.market_data.current_price["usd"])
@@ -130,49 +130,56 @@ const App = () => {
     updateMintStats();
     let key;
     let message;
+    let price = currentGstUsdPrice;
     switch (true) {
-      case (currentGstUsdPrice < 2) : 
+      case (price < 2):
         key = "200-0"
         message = "GMT lower than 2 USD"
         break;
-        case (currentGstUsdPrice < 3) : 
+      case (price < 3):
         key = "160-40"
         message = "GMT between 2 and 3 USD"
         break;
-        case (currentGstUsdPrice < 4) : 
+      case (price < 4):
         key = "120-80"
         message = "GMT between 3 and 4 USD"
         break;
-        case (currentGstUsdPrice < 8) : 
+      case (price < 8):
         key = "100-100"
         message = "GMT between 4 and 8 USD"
         break;
-        case (currentGstUsdPrice < 10) : 
+      case (price < 10):
         key = "80-120"
         message = "GMT between 8 and 10 USD"
         break;
-        case (currentGstUsdPrice > 10) : 
+      case (price > 10):
         key = "40-160"
         message = "GMT higher than 10 USD"
         break;
       default:
-        key="Error"
+        key = "Error"
         break;
     }
 
     let gstAmount = key.split('-')[0].trim()
     let gmtAmount = key.split('-')[1].trim()
-    console.log(key)
     return <Card className="mx-auto m-4">
       <Card.Header as="h5">Is minting worth?</Card.Header>
       <Card.Body>
-      <div>
-        <small className="text-muted">{message} - {currentGstUsdPrice} $</small>
-            <h5 className="mt-1">{key} + level5 = <b>{customRound(mintValues[key].eur + levelCost[5].eur)}€</b> = <b>{customRound(mintValues[key].sol + levelCost[5].sol)}SOL</b></h5>
-            <b>Mint</b>: {gstAmount}GST+{gmtAmount}GMT = <b>{customRound(mintValues[key].eur)}€</b> = <b>{customRound(mintValues[key].sol)}SOL</b><br />
-            <b>Level5</b>: 20GST+10GMT = <b>{customRound(levelCost[5].eur)}€</b> = <b>{customRound(levelCost[5].sol)}SOL</b><br />
-        </div>
-        <br/><br/>
+        {
+          price ?
+            <div>
+              <small className="text-muted">{message} - {price} $</small>
+              <h5 className="mt-1">{key} + level5 = <b>{customRound(mintValues[key].eur + levelCost[5].eur)}€</b> = <b>{customRound(mintValues[key].sol + levelCost[5].sol)}SOL</b></h5>
+              <b>Mint</b>: {gstAmount}GST+{gmtAmount}GMT = <b>{customRound(mintValues[key].eur)}€</b> = <b>{customRound(mintValues[key].sol)}SOL</b><br />
+              <b>Level5</b>: 20GST+10GMT = <b>{customRound(levelCost[5].eur)}€</b> = <b>{customRound(levelCost[5].sol)}SOL</b><br />
+            </div>
+            : <div className="d-flex justify-content-center">
+              <div className="spinner-border" role="status">
+              </div>
+            </div>
+        }
+        <br />
       </Card.Body>
     </Card>
   }
