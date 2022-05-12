@@ -134,27 +134,27 @@ const App = () => {
     switch (true) {
       case (price < 2):
         key = "200-0"
-        message = "GMT lower than 2 USD"
+        message = "GST lower than 2 USD"
         break;
       case (price < 3):
         key = "160-40"
-        message = "GMT between 2 and 3 USD"
+        message = "GST between 2 and 3 USD"
         break;
       case (price < 4):
         key = "120-80"
-        message = "GMT between 3 and 4 USD"
+        message = "GST between 3 and 4 USD"
         break;
       case (price < 8):
         key = "100-100"
-        message = "GMT between 4 and 8 USD"
+        message = "GST between 4 and 8 USD"
         break;
       case (price < 10):
         key = "80-120"
-        message = "GMT between 8 and 10 USD"
+        message = "GST between 8 and 10 USD"
         break;
       case (price > 10):
         key = "40-160"
-        message = "GMT higher than 10 USD"
+        message = "GST higher than 10 USD"
         break;
       default:
         key = "Error"
