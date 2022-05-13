@@ -5,6 +5,7 @@ import logo from './logo512.png';
 const App = () => {
 
   const url = "https://api.coingecko.com/api/v3/coins/"
+  const dailyGstValue = 28
 
   const cryptoIdList = ["green-satoshi-token", "stepn", "solana"]
   const fiatIdList = ["eur", "usd"]
@@ -55,7 +56,7 @@ const App = () => {
           setUsdEurRateo(usdEurRateoUpdated);
           updateMintStats();
           if(init)
-            handleChangeText('green-satoshi-token', 19);
+            handleChangeText('green-satoshi-token', dailyGstValue);
         })
       })
     })
