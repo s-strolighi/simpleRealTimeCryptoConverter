@@ -169,7 +169,7 @@ function CardMinting() {
       key = "80-120"
       message = "GST between 8 and 10 USD"
       break;
-    case (price > 10):
+    case (price >= 10):
       key = "40-160"
       message = "GST higher than 10 USD"
       break;
@@ -180,6 +180,8 @@ function CardMinting() {
 
   let gstAmount = key.split('-')[0].trim()
   let gmtAmount = key.split('-')[1].trim()
+  let totalSolPrice = customRound(mintValues[key].sol + levelCost[5].sol)
+  let totalEurPrice = customRound(mintValues[key].eur + levelCost[5].eur)
   return <Card className="mx-auto m-4">
     <Card.Header as="h5">Is minting worth?</Card.Header>
     <Card.Body>
@@ -187,7 +189,9 @@ function CardMinting() {
         price ?
           <div>
             <small className="text-muted">{message} - {price} $</small>
-            <h5 className="mt-1">{key} + level5 = <b>{customRound(mintValues[key].eur + levelCost[5].eur)}€</b> = <b>{customRound(mintValues[key].sol + levelCost[5].sol)}SOL</b></h5>
+            <h5 className="mt-1">{gstAmount}/{gmtAmount} + level5 = <b>{totalEurPrice}€</b> = <b>{totalSolPrice}SOL</b></h5>
+            <small className="text-muted">{"(floor price including 6% fee)"}</small><br/>
+            <h5>Sell price = <b>{customRound(totalEurPrice/0.94)}€</b> = <b>{customRound(totalSolPrice/0.94)}SOL</b></h5><br/>
             <b>Mint</b>: {gstAmount}GST+{gmtAmount}GMT = <b>{customRound(mintValues[key].eur)}€</b> = <b>{customRound(mintValues[key].sol)}SOL</b><br />
             <b>Level5</b>: 20GST+10GMT = <b>{customRound(levelCost[5].eur)}€</b> = <b>{customRound(levelCost[5].sol)}SOL</b><br />
           </div>
