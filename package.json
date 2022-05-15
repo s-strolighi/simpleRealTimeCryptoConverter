@@ -1,6 +1,6 @@
 {
-  "homepage": "https://s-strolighi.github.io/simpleRealTimeCryptoConverter",
-  "name": "simple_crypto_converter",
+  "homepage": "https://s-strolighi.github.io/stepnHelper",
+  "name": "stepn_helper",
   "version": "0.1.0",
   "private": true,
   "dependencies": {

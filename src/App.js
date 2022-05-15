@@ -241,7 +241,7 @@ const App = () => {
             height="50"
             className="d-inline-block"
           />{' '}
-          Simple real time crypto converter
+          Simple STEP'N helper tool
         </Navbar.Brand>
       </Container>
     </Navbar>
