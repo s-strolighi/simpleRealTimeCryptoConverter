@@ -6,6 +6,7 @@ const App = () => {
 
   const url = "https://api.coingecko.com/api/v3/coins/"
   const dailyGstValue = 28
+  const apiRefreshTimer = 180 //seconds
 
   const cryptoIdList = ["green-satoshi-token", "stepn", "solana"]
   const fiatIdList = ["eur", "usd"]
@@ -32,7 +33,7 @@ const App = () => {
   const [levelCost, setLevelCost] = useState({ "5": { "eur": 0, "sol": 0 } })
 
   const updatePeriodicallySymbolsValues = () => {
-    setInterval(updateSymbolsValues, 15 * 1000)
+    setInterval(updateSymbolsValues, apiRefreshTimer * 1000)
   }
 
   const updateSymbolsValues = (init = false) => {
