@@ -224,17 +224,17 @@ const App = () => {
         {
           price ?
             <div>
-              {
-                currentMintKey === "customMintKey" ?
-                    <div className="input-group input-group-sm mb-3">
+              
+                 
+                    <div className="input-group input-group-sm mb-3" hidden={! currentMintKey === "customMintKey"}>
                       <div className="input-group-prepend">
                         <span className="input-group-text" id="">GST/GMT</span>
                       </div>
                       <input type="text" className="form-control" id="customGstAmount" placeholder={"GST amount..."} value={customGstAmount || ''} onChange={(e) => setCustomGstAmount(e.target.value)} />
                       <input type="text" className="form-control" id="customGmtAmount" placeholder={"GMT amount..."} value={customGmtAmount || ''} onChange={(e) => setCustomGmtAmount(e.target.value)} />
                     </div>  
-                  : null
-              }
+                
+              
 
               <small className="text-muted">{message} - {price} $</small>
               <h5 className="mt-1">{gstAmount}/{gmtAmount} + level5 = <b>{customRound(customTotalEurPrice)}€</b> = <b>{customRound(customTotalSolPrice)}SOL</b></h5>
