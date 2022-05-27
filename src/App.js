@@ -176,14 +176,27 @@ const App = () => {
         message = "GST higher than 10 USD"
         break;
       default:
-        mintKey = currentMintKey || "Error"
+        mintKey = currentMintKey || null
         break;
     }
 
-    let gstAmount = mintKey.split('/')[0].trim()
-    let gmtAmount = mintKey.split('/')[1].trim()
-    let totalSolPrice = customRound(mintValues[mintKey].sol + levelCost[5].sol)
-    let totalEurPrice = customRound(mintValues[mintKey].eur + levelCost[5].eur)
+
+    const [customGstAmount, setCustomGstAmount] = useState(0)
+    const [customGmtAmount, setCustomGmtAmount] = useState(0)
+
+    let customMintKey = mintKey
+    if (currentMintKey === 'customMintKey') {
+      customMintKey = "" + customGstAmount + '/' + customGmtAmount
+    }
+    let gstAmount = customMintKey.split('/')[0].trim()
+    let gmtAmount = customMintKey.split('/')[1].trim()
+
+    let customMintEurPrice = (symbolsValue['green-satoshi-token'].eur * parseFloat(gstAmount)) + (symbolsValue['stepn'].eur * parseFloat(gmtAmount))
+    let customMintSolPrice = customMintEurPrice / symbolsValue['solana'].eur
+
+    let customTotalEurPrice = customMintEurPrice + levelCost["5"].eur
+    let customTotalSolPrice = customTotalEurPrice / symbolsValue['solana'].eur
+
     return <Card className="mx-auto m-4">
       <Card.Header as="h5">
         <div className="row">
@@ -192,13 +205,15 @@ const App = () => {
 
           </div>
           <div className="col col-lg-4">
-            <DropdownButton title={gstAmount+"GST+"+gmtAmount+"GMT"} size="sm">
+            <DropdownButton title={gstAmount + "GST+" + gmtAmount + "GMT"} size="sm">
               <Dropdown.Item as="button" onClick={() => setCurrentMintKey("200/0")}><b>{200}</b>GST+<b>{0}</b>GMT {"(GST < 2$)"}</Dropdown.Item>
               <Dropdown.Item as="button" onClick={() => setCurrentMintKey("160/40")}><b>{160}</b>GST+<b>{40}</b>GMT {"(GST 2-3$)"}</Dropdown.Item>
               <Dropdown.Item as="button" onClick={() => setCurrentMintKey("120/80")}><b>{120}</b>GST+<b>{80}</b>GMT {"(GST 3-4$)"}</Dropdown.Item>
               <Dropdown.Item as="button" onClick={() => setCurrentMintKey("100/100")}><b>{100}</b>GST+<b>{100}</b>GMT {"(GST 4-8$)"}</Dropdown.Item>
               <Dropdown.Item as="button" onClick={() => setCurrentMintKey("80/120")}><b>{80}</b>GST+<b>{120}</b>GMT {"(GST 8-10$)"}</Dropdown.Item>
               <Dropdown.Item as="button" onClick={() => setCurrentMintKey("40/160")}><b>{40}</b>GST+<b>{160}</b>GMT {"(GST > 10$)"}</Dropdown.Item>
+              <Dropdown.Divider />
+              <Dropdown.Item as="button" onClick={() => setCurrentMintKey("customMintKey")}><b>Custom GST/GMT</b></Dropdown.Item>
 
             </DropdownButton>
           </div>
@@ -209,13 +224,26 @@ const App = () => {
         {
           price ?
             <div>
+              {
+                currentMintKey === "customMintKey" ?
+                    <div className="input-group input-group-sm mb-3">
+                      <div className="input-group-prepend">
+                        <span className="input-group-text" id="">GST/GMT</span>
+                      </div>
+                      <input type="text" className="form-control" id="customGstAmount" placeholder={"GST amount..."} value={customGstAmount || ''} onChange={(e) => setCustomGstAmount(e.target.value)} />
+                      <input type="text" className="form-control" id="customGmtAmount" placeholder={"GMT amount..."} value={customGmtAmount || ''} onChange={(e) => setCustomGmtAmount(e.target.value)} />
+                    </div>  
+                  : null
+              }
+
               <small className="text-muted">{message} - {price} $</small>
-              <h5 className="mt-1">{mintKey} + level5 = <b>{totalEurPrice}€</b> = <b>{totalSolPrice}SOL</b></h5>
+              <h5 className="mt-1">{gstAmount}/{gmtAmount} + level5 = <b>{customRound(customTotalEurPrice)}€</b> = <b>{customRound(customTotalSolPrice)}SOL</b></h5>
               <small className="text-muted">{"(floor price including 6% fee)"}</small><br />
-              <h5>Sell price = <b>{customRound(totalEurPrice / 0.94)}€</b> = <b>{customRound(totalSolPrice / 0.94)}SOL</b></h5><br />
-              <b>Mint</b>: {gstAmount}GST+{gmtAmount}GMT = <b>{customRound(mintValues[mintKey].eur)}€</b> = <b>{customRound(mintValues[mintKey].sol)}SOL</b><br />
+              <h5>Sell price = <b>{customRound(customTotalEurPrice / 0.94)}€</b> = <b>{customRound(customTotalSolPrice / 0.94)}SOL</b></h5><br />
+              <b>Mint</b>: {gstAmount}GST+{gmtAmount}GMT = <b>{customRound(customMintEurPrice)}€</b> = <b>{customRound(customMintSolPrice)}SOL</b><br />
               <b>Level5</b>: 20GST+10GMT = <b>{customRound(levelCost[5].eur)}€</b> = <b>{customRound(levelCost[5].sol)}SOL</b><br />
             </div>
+
             : <div className="d-flex justify-content-center">
               <div className="spinner-border" role="status">
               </div>
@@ -251,7 +279,7 @@ const App = () => {
         <Card className="mx-auto m-4">
           <Card.Header as="h5">Real time converter</Card.Header>
           <Card.Body>
-            <Card.Title className="mb-3">Select your crypto or change them</Card.Title>
+            <Card.Title className="mb-3">Convert crypto/fiat in real time</Card.Title>
             <div className="row">
               {
                 cryptoIdList.map((value, index) => {
