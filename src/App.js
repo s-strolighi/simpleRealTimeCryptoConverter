@@ -230,8 +230,8 @@ const App = () => {
                       <div className="input-group-prepend">
                         <span className="input-group-text" id="">GST/GMT</span>
                       </div>
-                      <input type="text" className="form-control" id="customGstAmount" placeholder={"GST amount..."} value={customGstAmount || ''} onChange={(e) => setCustomGstAmount(e.target.value)} />
-                      <input type="text" className="form-control" id="customGmtAmount" placeholder={"GMT amount..."} value={customGmtAmount || ''} onChange={(e) => setCustomGmtAmount(e.target.value)} />
+                      <input type="text" className="form-control" id="customGstAmount" placeholder={"GST amount..."} value={customGstAmount || ''} pattern="\d*" onChange={(e) => setCustomGstAmount(e.target.value)} />
+                      <input type="text" className="form-control" id="customGmtAmount" placeholder={"GMT amount..."} value={customGmtAmount || ''} pattern="\d*" onChange={(e) => setCustomGmtAmount(e.target.value)} />
                     </div>  
                 
               
@@ -286,7 +286,7 @@ const App = () => {
                   return <div key={'crypto' + index} className="col-lg mb-3">
                     <InputGroup>
                       <Button variant="outline-primary">{symbols[value]}</Button>
-                      <FormControl placeholder="insert" value={allValues[value] || ''} onChange={(e) => handleChangeText(value, e.target.value)} />
+                      <FormControl placeholder="insert" value={allValues[value] || ''} pattern="\d*" onChange={(e) => handleChangeText(value, e.target.value)} />
                     </InputGroup>
                   </div>
                 })
