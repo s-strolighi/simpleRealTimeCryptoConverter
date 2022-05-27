@@ -103,12 +103,12 @@ const App = () => {
       })
       if (done) {
         if (symbol === 'eur') {
-          allValuesUpdated.eur = amount
-          allValuesUpdated.usd = amount * usdEurRateo
+          allValuesUpdated.eur = parseFloat(amount)
+          allValuesUpdated.usd = parseFloat(amount) * usdEurRateo
         }
         else if (symbol === 'usd') {
-          allValuesUpdated.eur = amount / usdEurRateo
-          allValuesUpdated.usd = amount
+          allValuesUpdated.eur = parseFloat(amount) / usdEurRateo
+          allValuesUpdated.usd = parseFloat(amount)
         }
       }
     }
@@ -181,12 +181,14 @@ const App = () => {
     }
 
 
-    const [customGstAmount, setCustomGstAmount] = useState(0)
-    const [customGmtAmount, setCustomGmtAmount] = useState(0)
+    const [customGstAmount, setCustomGstAmount] = useState(null)
+    const [customGmtAmount, setCustomGmtAmount] = useState(null)
 
     let customMintKey = mintKey
     if (currentMintKey === 'customMintKey') {
-      customMintKey = "" + customGstAmount + '/' + customGmtAmount
+      customMintKey = customGstAmount || "0" 
+      customMintKey += '/'
+      customMintKey += customGmtAmount || "0"
     }
     let gstAmount = customMintKey.split('/')[0].trim()
     let gmtAmount = customMintKey.split('/')[1].trim()
@@ -226,12 +228,12 @@ const App = () => {
             <div>
               
                  
-                    <div className="input-group input-group-sm mb-3" hidden={! currentMintKey === "customMintKey"}>
+                    <div className="input-group input-group-sm mb-3" hidden={!(currentMintKey=="customMintKey")}>
                       <div className="input-group-prepend">
-                        <span className="input-group-text" id="">GST/GMT</span>
+                      <button class="btn btn-outline-primary btn-sm" type="button">GST/GMT</button>
                       </div>
-                      <input type="text" className="form-control" id="customGstAmount" placeholder={"GST amount..."} value={customGstAmount || ''} inputMode='decimal' onChange={(e) => setCustomGstAmount(e.target.value)} />
-                      <input type="text" className="form-control" id="customGmtAmount" placeholder={"GMT amount..."} value={customGmtAmount || ''} inputMode='decimal' onChange={(e) => setCustomGmtAmount(e.target.value)} />
+                      <input type="text" className="form-control" id="customGstAmount" placeholder={"GST amount..."} value={customGstAmount || ''} inputMode='decimal' onChange={(e) => setCustomGstAmount(e.target.value?.replace(',','.'))} />
+                      <input type="text" className="form-control" id="customGmtAmount" placeholder={"GMT amount..."} value={customGmtAmount || ''} inputMode='decimal' onChange={(e) => setCustomGmtAmount(e.target.value?.replace(',','.'))} />
                     </div>  
                 
               
@@ -286,7 +288,7 @@ const App = () => {
                   return <div key={'crypto' + index} className="col-lg mb-3">
                     <InputGroup>
                       <Button variant="outline-primary">{symbols[value]}</Button>
-                      <FormControl placeholder="insert" value={allValues[value] || ''} inputMode='decimal' onChange={(e) => handleChangeText(value, e.target.value)} />
+                      <FormControl type='text' placeholder="insert" value={allValues[value] || ''} inputMode='decimal' onChange={(e) => handleChangeText(value, e.target.value?.replace(',','.'))} />
                     </InputGroup>
                   </div>
                 })
