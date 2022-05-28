@@ -1,23 +1,28 @@
 import { useEffect, useState } from "react";
-import { Navbar, Container, Card, InputGroup, FormControl, Button, Form, Dropdown, DropdownButton } from "react-bootstrap";
+import { Navbar, Container, Card, InputGroup, FormControl, Button, Row, Dropdown, DropdownButton, Col } from "react-bootstrap";
 import logo from './logo512.png';
 
 const App = () => {
 
-  const url = "https://api.coingecko.com/api/v3/coins/"
+  const url = "https://api.coingecko.com/api/v3/simple/price?ids="
   const dailyGstValue = 39
   const apiRefreshTimer = 180 //seconds
 
-  const cryptoIdList = ["green-satoshi-token", "stepn", "solana"]
+  //crypto api code list
+  const cryptoIdList = ["green-satoshi-token", "stepn", "solana", "green-satoshi-token-bsc", "binancecoin"]
   const fiatIdList = ["eur", "usd"]
   const [currentGstUsdPrice, setCurrentGstUsdPrice] = useState(0)
   const [currentMintKey, setCurrentMintKey] = useState(null)
 
-  const symbols = { 'green-satoshi-token': 'GST', 'stepn': 'GMT', 'solana': 'SOL' }
+  //crypto name
+  const symbols = { 'green-satoshi-token': 'GST', 'stepn': 'GMT', 'solana': 'SOL', 'binancecoin': 'BNB', 'green-satoshi-token-bsc': 'GST(BSC)' }
+  //crypto init value
   const [symbolsValue, setSymbolsValue] = useState({
     'green-satoshi-token': { eur: 0, usd: 0 },
     'stepn': { eur: 0, usd: 0 },
-    'solana': { eur: 0, usd: 0 }
+    'solana': { eur: 0, usd: 0 },
+    'binancecoin': { eur: 0, usd: 0 },
+    'green-satoshi-token-bsc': { eur: 0, usd: 0 }
   });
   const [usdEurRateo, setUsdEurRateo] = useState(0)
 
@@ -39,32 +44,28 @@ const App = () => {
   const updateSymbolsValues = (init = false) => {
     let symbolsValueUpdated = symbolsValue;
     let usdEurRateoUpdated = usdEurRateo;
-    getValue(cryptoIdList[0]).then(GST => {
-      getValue(cryptoIdList[1]).then(GMT => {
-        getValue(cryptoIdList[2]).then(SOL => {
-          symbolsValueUpdated["green-satoshi-token"].eur = GST.market_data.current_price["eur"]
-          symbolsValueUpdated["green-satoshi-token"].usd = GST.market_data.current_price["usd"]
-
-          symbolsValueUpdated["stepn"].eur = GMT.market_data.current_price["eur"]
-          symbolsValueUpdated["stepn"].usd = GMT.market_data.current_price["usd"]
-
-          symbolsValueUpdated["solana"].eur = SOL.market_data.current_price["eur"]
-          symbolsValueUpdated["solana"].usd = SOL.market_data.current_price["usd"]
-
-          usdEurRateoUpdated = symbolsValueUpdated["solana"].usd / symbolsValueUpdated["solana"].eur
-
-          setSymbolsValue(symbolsValueUpdated);
-          setUsdEurRateo(usdEurRateoUpdated);
-          updateMintStats();
-          if (init)
-            handleChangeText('green-satoshi-token', dailyGstValue);
-        })
+    getValue(cryptoIdList).then(cryptos => {
+      let done = cryptoIdList.every((currentCrypto) => {
+        symbolsValueUpdated[currentCrypto].eur = cryptos[currentCrypto].eur
+        symbolsValueUpdated[currentCrypto].usd = cryptos[currentCrypto].usd
+        return true
       })
+
+      if (done) {
+        usdEurRateoUpdated = symbolsValueUpdated["solana"].usd / symbolsValueUpdated["solana"].eur
+
+        setSymbolsValue(symbolsValueUpdated);
+        setUsdEurRateo(usdEurRateoUpdated);
+        updateMintStats();
+        if (init)
+          handleChangeText('green-satoshi-token', dailyGstValue);
+      }
     })
   }
 
-  const getValue = async (from) => {
-    return await fetch(url + from)
+  const getValue = async (cryptos) => {
+    cryptos = cryptos.join(',')
+    return await fetch(url + cryptos + '&vs_currencies=eur,usd')
       .then((response) => {
         if (!response.ok) throw new Error(response.status);
         else return response.json();
@@ -180,13 +181,12 @@ const App = () => {
         break;
     }
 
-
     const [customGstAmount, setCustomGstAmount] = useState(null)
     const [customGmtAmount, setCustomGmtAmount] = useState(null)
 
     let customMintKey = mintKey
     if (currentMintKey === 'customMintKey') {
-      customMintKey = customGstAmount || "0" 
+      customMintKey = customGstAmount || "0"
       customMintKey += '/'
       customMintKey += customGmtAmount || "0"
     }
@@ -204,7 +204,6 @@ const App = () => {
         <div className="row">
           <div className="col col-lg-4">
             Is minting worth?
-
           </div>
           <div className="col col-lg-4">
             <DropdownButton title={gstAmount + "GST+" + gmtAmount + "GMT"} size="sm">
@@ -220,23 +219,18 @@ const App = () => {
             </DropdownButton>
           </div>
         </div>
-
       </Card.Header>
       <Card.Body>
         {
           price ?
             <div>
-              
-                 
-                    <div className="input-group input-group-sm mb-3" hidden={!(currentMintKey=="customMintKey")}>
-                      <div className="input-group-prepend">
-                      <button class="btn btn-outline-primary btn-sm" type="button">GST/GMT</button>
-                      </div>
-                      <input type="text" className="form-control" id="customGstAmount" placeholder={"GST amount..."} value={customGstAmount || ''} inputMode='decimal' onChange={(e) => setCustomGstAmount(e.target.value?.replace(',','.'))} />
-                      <input type="text" className="form-control" id="customGmtAmount" placeholder={"GMT amount..."} value={customGmtAmount || ''} inputMode='decimal' onChange={(e) => setCustomGmtAmount(e.target.value?.replace(',','.'))} />
-                    </div>  
-                
-              
+              <div className="input-group input-group-sm mb-3" hidden={!(currentMintKey == "customMintKey")}>
+                <div className="input-group-prepend">
+                  <button className="btn btn-outline-primary btn-sm" type="button">GST/GMT</button>
+                </div>
+                <input type="text" className="form-control" id="customGstAmount" placeholder={"GST amount..."} value={customGstAmount || ''} inputMode='decimal' onChange={(e) => setCustomGstAmount(e.target.value?.replace(',', '.'))} />
+                <input type="text" className="form-control" id="customGmtAmount" placeholder={"GMT amount..."} value={customGmtAmount || ''} inputMode='decimal' onChange={(e) => setCustomGmtAmount(e.target.value?.replace(',', '.'))} />
+              </div>
 
               <small className="text-muted">{message} - {price} $</small>
               <h5 className="mt-1">{gstAmount}/{gmtAmount} + level5 = <b>{customRound(customTotalEurPrice)}€</b> = <b>{customRound(customTotalSolPrice)}SOL</b></h5>
@@ -257,6 +251,7 @@ const App = () => {
   }
 
   useEffect(() => {
+    
     updateSymbolsValues(true)
     updatePeriodicallySymbolsValues();
   }, [])
@@ -282,30 +277,44 @@ const App = () => {
           <Card.Header as="h5">Real time converter</Card.Header>
           <Card.Body>
             <Card.Title className="mb-3">Convert crypto/fiat in real time</Card.Title>
-            <div className="row">
+            <Row xs={1} lg={3}>
               {
-                cryptoIdList.map((value, index) => {
-                  return <div key={'crypto' + index} className="col-lg mb-3">
+                cryptoIdList.slice(0,3).map((value, index) => {
+                  return <Col key={'crypto' + index} className="mb-3">
                     <InputGroup>
                       <Button variant="outline-primary">{symbols[value]}</Button>
-                      <FormControl type='text' placeholder="insert" value={allValues[value] || ''} inputMode='decimal' onChange={(e) => handleChangeText(value, e.target.value?.replace(',','.'))} />
+                      <FormControl type='text' placeholder="insert" value={allValues[value] || ''} inputMode='decimal' onChange={(e) => handleChangeText(value, e.target.value?.replace(',', '.'))} />
                     </InputGroup>
-                  </div>
+                  </Col>
                 })
               }
-              <hr />
+            </Row>
+            <hr />
+            <Row xs={1} lg={2}>
+              {
+                cryptoIdList.slice(3,5).map((value, index) => {
+                  return <Col key={'crypto' + index} className="mb-3">
+                    <InputGroup>
+                      <Button variant="outline-primary">{symbols[value]}</Button>
+                      <FormControl type='text' placeholder="insert" value={allValues[value] || ''} inputMode='decimal' onChange={(e) => handleChangeText(value, e.target.value?.replace(',', '.'))} />
+                    </InputGroup>
+                  </Col>
+                })
+              }
+            </Row>
+            <hr />
+            <Row xs={1} lg={2}>
               {
                 fiatIdList.map((value, index) => {
-                  return <div key={'fiat' + index} className="col-lg mb-3">
+                  return <Col key={'fiat' + index} className=" mb-3">
                     <InputGroup>
                       <Button variant="outline-primary">{value.toUpperCase()}</Button>
                       <FormControl placeholder="insert" value={allValues[value] || ''} onChange={(e) => handleChangeText(value, e.target.value)} />
                     </InputGroup>
-                  </div>
+                  </Col>
                 })
               }
-
-            </div>
+            </Row>
           </Card.Body>
         </Card>
       </div>
@@ -313,9 +322,6 @@ const App = () => {
         <CardMinting />
       </div>
     </div>
-
-
-
   </>
 }
 
