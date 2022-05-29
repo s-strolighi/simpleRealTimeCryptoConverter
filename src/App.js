@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Navbar, Container, Card, InputGroup, FormControl, Button, Row, Dropdown, DropdownButton, Col } from "react-bootstrap";
+import { Navbar, Container, Card, InputGroup, FormControl, Button, Row, Dropdown, DropdownButton, Col, Form } from "react-bootstrap";
 import logo from './logo512.png';
 
 const App = () => {
@@ -35,7 +35,39 @@ const App = () => {
     "80/120": { "eur": 0, "sol": 0 },
     "40/160": { "eur": 0, "sol": 0 }
   })
-  const [levelCost, setLevelCost] = useState({ "5": { "eur": 0, "sol": 0 } })
+  const levelCumulativeCost = {
+    0: { gst: 0, gmt: 0 },
+    1: { gst: 1, gmt: 0 },
+    2: { gst: 3, gmt: 0 },
+    3: { gst: 6, gmt: 0 },
+    4: { gst: 10, gmt: 0 },
+    5: { gst: 20, gmt: 10 },
+    6: { gst: 26, gmt: 10 },
+    7: { gst: 33, gmt: 10 },
+    8: { gst: 41, gmt: 10 },
+    9: { gst: 50, gmt: 10 },
+    10: { gst: 80, gmt: 40 },
+    11: { gst: 91, gmt: 40 },
+    12: { gst: 103, gmt: 40 },
+    13: { gst: 116, gmt: 40 },
+    14: { gst: 130, gmt: 40 },
+    15: { gst: 145, gmt: 40 },
+    16: { gst: 161, gmt: 40 },
+    17: { gst: 178, gmt: 40 },
+    18: { gst: 196, gmt: 40 },
+    19: { gst: 215, gmt: 40 },
+    20: { gst: 275, gmt: 100 },
+    21: { gst: 296, gmt: 100 },
+    22: { gst: 318, gmt: 100 },
+    23: { gst: 341, gmt: 100 },
+    24: { gst: 365, gmt: 100 },
+    25: { gst: 390, gmt: 100 },
+    26: { gst: 416, gmt: 100 },
+    27: { gst: 443, gmt: 100 },
+    28: { gst: 471, gmt: 100 },
+    29: { gst: 500, gmt: 129 },
+    30: { gst: 600, gmt: 229 },
+  }
 
   const updatePeriodicallySymbolsValues = () => {
     setInterval(updateSymbolsValues, apiRefreshTimer * 1000)
@@ -119,7 +151,6 @@ const App = () => {
 
   const updateMintStats = () => {
     let mintValuesUpdated = mintValues;
-    let levelCostUpdated = levelCost;
 
     let done = Object.keys(mintValues).every(value => {
       let key = value
@@ -133,10 +164,6 @@ const App = () => {
     })
 
     if (done) {
-      levelCostUpdated[5].eur = symbolsValue["green-satoshi-token"].eur * 20 + symbolsValue["stepn"].eur * 10
-      levelCostUpdated[5].sol = levelCostUpdated[5].eur / symbolsValue["solana"].eur
-
-      setLevelCost(levelCostUpdated)
       setMintValues(mintValuesUpdated)
       setCurrentGstUsdPrice(symbolsValue["green-satoshi-token"].usd)
     }
@@ -183,20 +210,39 @@ const App = () => {
 
     const [customGstAmount, setCustomGstAmount] = useState(null)
     const [customGmtAmount, setCustomGmtAmount] = useState(null)
+    const [customLevelActive, setCustomLevelActive] = useState(false)
+    const toggleCustomLevelActive = () => { 
+      setCustomLevelActive(!customLevelActive) 
+      setCustomLevelFrom(0)
+      setCustomLevelTo(5)
+    }
+    const [customLevelFrom, setCustomLevelFrom] = useState(0)
+    const [customLevelTo, setCustomLevelTo] = useState(5)
 
+    let levelFrom = 0
+    let levelTo = 5
     let customMintKey = mintKey
     if (currentMintKey === 'customMintKey') {
       customMintKey = customGstAmount || "0"
       customMintKey += '/'
       customMintKey += customGmtAmount || "0"
     }
+
+    if (customLevelActive) {
+      levelFrom = customLevelFrom
+      levelTo = customLevelTo
+    }
+
     let gstAmount = customMintKey.split('/')[0].trim()
     let gmtAmount = customMintKey.split('/')[1].trim()
 
     let customMintEurPrice = (symbolsValue['green-satoshi-token'].eur * parseFloat(gstAmount)) + (symbolsValue['stepn'].eur * parseFloat(gmtAmount))
     let customMintSolPrice = customMintEurPrice / symbolsValue['solana'].eur
 
-    let customTotalEurPrice = customMintEurPrice + levelCost["5"].eur
+    let customLevelUpEurPrice = (symbolsValue['green-satoshi-token'].eur * parseFloat(levelCumulativeCost[levelTo].gst - levelCumulativeCost[levelFrom].gst)) + (symbolsValue['stepn'].eur * parseFloat(levelCumulativeCost[levelTo].gmt - levelCumulativeCost[levelFrom].gmt))
+    let customLevelUpSolPrice = customLevelUpEurPrice / symbolsValue['solana'].eur
+
+    let customTotalEurPrice = customMintEurPrice + customLevelUpEurPrice
     let customTotalSolPrice = customTotalEurPrice / symbolsValue['solana'].eur
 
     return <Card className="mx-auto m-4">
@@ -233,11 +279,50 @@ const App = () => {
               </div>
 
               <small className="text-muted">{message} - {price} $</small>
-              <h5 className="mt-1">{gstAmount}/{gmtAmount} + level5 = <b>{customRound(customTotalEurPrice)}€</b> = <b>{customRound(customTotalSolPrice)}SOL</b></h5>
+              <h5 className="mt-1"><b>Total</b> = {gstAmount}/{gmtAmount} + lvl {levelFrom}-{levelTo} = <b>{customRound(customTotalSolPrice)}SOL</b></h5>
+
+              <br/>
               <small className="text-muted">{"(floor price including 6% fee)"}</small><br />
-              <h5>Sell price = <b>{customRound(customTotalEurPrice / 0.94)}€</b> = <b>{customRound(customTotalSolPrice / 0.94)}SOL</b></h5><br />
+              <h5>Sell price = <b>{customRound(customTotalSolPrice / 0.94)}SOL</b></h5><br />
+
               <b>Mint</b>: {gstAmount}GST+{gmtAmount}GMT = <b>{customRound(customMintEurPrice)}€</b> = <b>{customRound(customMintSolPrice)}SOL</b><br />
-              <b>Level5</b>: 20GST+10GMT = <b>{customRound(levelCost[5].eur)}€</b> = <b>{customRound(levelCost[5].sol)}SOL</b><br />
+              <b>Level {levelFrom}-{levelTo}</b>: {levelCumulativeCost[levelTo].gst - levelCumulativeCost[levelFrom].gst}GST+{levelCumulativeCost[levelTo].gmt - levelCumulativeCost[levelFrom].gmt}GMT = <b>{customRound(customLevelUpEurPrice)}€</b> = <b>{customRound(customLevelUpSolPrice)}SOL</b><br />
+
+              <br/>
+              <Form.Check
+                type="switch"
+                label="Custom level up range"
+                onChange={toggleCustomLevelActive}
+              />
+              <Row xs={1} lg={2} className='mt-3'>
+                <Col className="mb-3">
+                  <InputGroup>
+                    <Form.Label><b>Current: {levelFrom}</b></Form.Label>
+                    <Form.Range
+                      max={levelTo}
+                      min={0}
+                      step={1}
+                      value={levelFrom}
+                      onChange={(e) => setCustomLevelFrom(parseInt(e.target.value))}
+                      disabled={!customLevelActive}
+                    />
+                  </InputGroup>
+                </Col>
+                <Col className="mb-3">
+                  <InputGroup>
+                    <Form.Label><b>Target: {levelTo}</b></Form.Label>
+                    <Form.Range
+                      max={30}
+                      min={levelFrom}
+                      step={1}
+                      value={levelTo}
+                      onChange={(e) => setCustomLevelTo(parseInt(e.target.value))}
+                      disabled={!customLevelActive}
+                    />
+                  </InputGroup>
+                </Col>
+              </Row>
+
             </div>
 
             : <div className="d-flex justify-content-center">
@@ -251,7 +336,7 @@ const App = () => {
   }
 
   useEffect(() => {
-    
+
     updateSymbolsValues(true)
     updatePeriodicallySymbolsValues();
   }, [])
@@ -279,7 +364,7 @@ const App = () => {
             <Card.Title className="mb-3">Convert crypto/fiat in real time</Card.Title>
             <Row xs={1} lg={3}>
               {
-                cryptoIdList.slice(0,3).map((value, index) => {
+                cryptoIdList.slice(0, 3).map((value, index) => {
                   return <Col key={'crypto' + index} className="mb-3">
                     <InputGroup>
                       <Button variant="outline-primary">{symbols[value]}</Button>
@@ -292,7 +377,7 @@ const App = () => {
             <hr />
             <Row xs={1} lg={2}>
               {
-                cryptoIdList.slice(3,5).map((value, index) => {
+                cryptoIdList.slice(3, 5).map((value, index) => {
                   return <Col key={'crypto' + index} className="mb-3">
                     <InputGroup>
                       <Button variant="outline-primary">{symbols[value]}</Button>
