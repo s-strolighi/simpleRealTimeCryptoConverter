@@ -98,7 +98,8 @@ const App = () => {
         setUsdEurRateo(usdEurRateoUpdated);
         updateMintStats();
         if (init) {
-          setTotalEurDailyIncome(symbolsValueUpdated['green-satoshi-token'].eur * dailyIncome['green-satoshi-token'] + symbolsValueUpdated['green-satoshi-token-bsc'].eur * dailyIncome['green-satoshi-token-bsc'])
+          let totalEurDailyIncome = symbolsValueUpdated['green-satoshi-token'].eur * dailyIncome['green-satoshi-token'] + symbolsValueUpdated['green-satoshi-token-bsc'].eur * dailyIncome['green-satoshi-token-bsc']
+          setTotalEurDailyIncome(totalEurDailyIncome)
           handleChangeText('solana', (totalEurDailyIncome / symbolsValueUpdated['solana'].eur));
         }
       }
@@ -373,7 +374,7 @@ const App = () => {
           <Card.Body>
             <Card.Title className="mb-3">
               <small>
-                Daily earning {dailyIncome["green-satoshi-token"]}GST + {dailyIncome["green-satoshi-token-bsc"]}GST(BSC) = {customRound(totalEurDailyIncome)}€
+                Earning {dailyIncome["green-satoshi-token"]}GST + {dailyIncome["green-satoshi-token-bsc"]}GST(BSC) = {customRound(totalEurDailyIncome)}€
               </small>
             </Card.Title>
 
