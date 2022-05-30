@@ -99,7 +99,7 @@ const App = () => {
         updateMintStats();
         if (init) {
           setTotalEurDailyIncome(symbolsValueUpdated['green-satoshi-token'].eur * dailyIncome['green-satoshi-token'] + symbolsValueUpdated['green-satoshi-token-bsc'].eur * dailyIncome['green-satoshi-token-bsc'])
-          handleChangeText('solana', totalEurDailyIncome / symbolsValueUpdated['solana'].eur);
+          handleChangeText('solana', (totalEurDailyIncome / symbolsValueUpdated['solana'].eur));
         }
       }
     })
