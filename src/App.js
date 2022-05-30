@@ -5,7 +5,15 @@ import logo from './logo512.png';
 const App = () => {
 
   const url = "https://api.coingecko.com/api/v3/simple/price?ids="
-  const dailyGstValue = 39
+  const dailyIncome = {
+    'green-satoshi-token': 18,
+    'green-satoshi-token-bsc': 19
+  }
+
+  const [totalEurDailyIncome, setTotalEurDailyIncome] = useState()
+
+
+
   const apiRefreshTimer = 180 //seconds
 
   //crypto api code list
@@ -89,8 +97,10 @@ const App = () => {
         setSymbolsValue(symbolsValueUpdated);
         setUsdEurRateo(usdEurRateoUpdated);
         updateMintStats();
-        if (init)
-          handleChangeText('green-satoshi-token', dailyGstValue);
+        if (init) {
+          setTotalEurDailyIncome(symbolsValueUpdated['green-satoshi-token'].eur * dailyIncome['green-satoshi-token'] + symbolsValueUpdated['green-satoshi-token-bsc'].eur * dailyIncome['green-satoshi-token-bsc'])
+          handleChangeText('solana', totalEurDailyIncome / symbolsValueUpdated['solana'].eur);
+        }
       }
     })
   }
@@ -211,8 +221,8 @@ const App = () => {
     const [customGstAmount, setCustomGstAmount] = useState(null)
     const [customGmtAmount, setCustomGmtAmount] = useState(null)
     const [customLevelActive, setCustomLevelActive] = useState(false)
-    const toggleCustomLevelActive = () => { 
-      setCustomLevelActive(!customLevelActive) 
+    const toggleCustomLevelActive = () => {
+      setCustomLevelActive(!customLevelActive)
       setCustomLevelFrom(0)
       setCustomLevelTo(5)
     }
@@ -281,14 +291,14 @@ const App = () => {
               <small className="text-muted">{message} - {price} $</small>
               <h5 className="mt-1"><b>Total</b> = {gstAmount}/{gmtAmount} + lvl {levelFrom}-{levelTo} = <b>{customRound(customTotalSolPrice)}SOL</b></h5>
 
-              <br/>
+              <br />
               <small className="text-muted">{"(floor price including 6% fee)"}</small><br />
               <h5>Sell price = <b>{customRound(customTotalSolPrice / 0.94)}SOL</b></h5><br />
 
               <b>Mint</b>: {gstAmount}GST+{gmtAmount}GMT = <b>{customRound(customMintEurPrice)}€</b> = <b>{customRound(customMintSolPrice)}SOL</b><br />
               <b>Level {levelFrom}-{levelTo}</b>: {levelCumulativeCost[levelTo].gst - levelCumulativeCost[levelFrom].gst}GST+{levelCumulativeCost[levelTo].gmt - levelCumulativeCost[levelFrom].gmt}GMT = <b>{customRound(customLevelUpEurPrice)}€</b> = <b>{customRound(customLevelUpSolPrice)}SOL</b><br />
 
-              <br/>
+              <br />
               <Form.Check
                 type="switch"
                 label="Custom level up range"
@@ -361,8 +371,13 @@ const App = () => {
         <Card className="mx-auto m-4">
           <Card.Header as="h5">Real time converter</Card.Header>
           <Card.Body>
-            <Card.Title className="mb-3">Convert crypto/fiat in real time</Card.Title>
-            <Row xs={1} lg={3}>
+            <Card.Title className="mb-3">
+              <small>
+                Daily earning {dailyIncome["green-satoshi-token"]}GST + {dailyIncome["green-satoshi-token-bsc"]}GST(BSC) = {customRound(totalEurDailyIncome)}€
+              </small>
+            </Card.Title>
+
+            <Row xs={1} lg={3} className='mt-4'>
               {
                 cryptoIdList.slice(0, 3).map((value, index) => {
                   return <Col key={'crypto' + index} className="mb-3">
