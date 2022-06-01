@@ -11,12 +11,18 @@ const App = () => {
   }
 
   
-  const [totalEurDailyIncome, setTotalEurDailyIncome] = useState()
+  const [totalEurDailyIncome, setTotalEurDailyIncome] = useState(0)
+  
+  const earnedDay = '06/01/2022'
+  const diffTime = Math.abs(new Date() - new Date(earnedDay)); //differenza di giorni tra il giorno corrente e il giorno dell'ultimo ritiro
+  const diffDays = parseInt(Math.ceil(diffTime / (1000 * 60 * 60 * 24))); //converto la differnza in giorni
+
   
   const eurSpesi = 1400 * 4
-  const eurRitirati = (536) * 4
+  const eurRitirati = (536) * 4 + totalEurDailyIncome * diffDays // calcolo se ritirassi adesso i soldi in sospeso dall'ultimo ritiro
+  
   const roi = parseInt((eurSpesi - eurRitirati) / totalEurDailyIncome)
-  const roiDate = new Date(new Date().setDate(new Date().getDate() + 56))
+  const roiDate = new Date(new Date().setDate(new Date().getDate() + roi))
   const roiDateFormat = roiDate.toLocaleDateString("it");
 
   const apiRefreshTimer = 180 //seconds
