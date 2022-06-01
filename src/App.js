@@ -10,9 +10,14 @@ const App = () => {
     'green-satoshi-token-bsc': 19
   }
 
+  
   const [totalEurDailyIncome, setTotalEurDailyIncome] = useState()
-
-
+  
+  const eurSpesi = 1400 * 4
+  const eurRitirati = (536) * 4
+  const roi = parseInt((eurSpesi - eurRitirati) / totalEurDailyIncome)
+  const roiDate = new Date(new Date().setDate(new Date().getDate() + 56))
+  const roiDateFormat = roiDate.toLocaleDateString("it");
 
   const apiRefreshTimer = 180 //seconds
 
@@ -372,6 +377,9 @@ const App = () => {
         <Card className="mx-auto m-4">
           <Card.Header as="h5">Real time converter</Card.Header>
           <Card.Body>
+              <small>
+                ROI = {roi} giorni --> {roiDateFormat}
+              </small>
             <Card.Title className="mb-3">
               <small>
                 Earning {dailyIncome["green-satoshi-token"]}GST + {dailyIncome["green-satoshi-token-bsc"]}GST(BSC) = {customRound(totalEurDailyIncome)}€
