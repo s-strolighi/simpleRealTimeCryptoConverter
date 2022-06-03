@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Navbar, Container, Card, InputGroup, FormControl, Button, Row, Dropdown, DropdownButton, Col, Form } from "react-bootstrap";
+import { Navbar, Container, Card, InputGroup, FormControl, Button, Row, Dropdown, DropdownButton, Col, Form, ProgressBar } from "react-bootstrap";
 import logo from './logo512.png';
 
 const App = () => {
@@ -10,18 +10,21 @@ const App = () => {
     'green-satoshi-token-bsc': 19
   }
 
-  
+
   const [totalEurDailyIncome, setTotalEurDailyIncome] = useState(0)
-  
-  const earnedDay = '06/01/2022'
+
+  const earnedDay = '05/30/2022' // MM/DD/YYY
   const diffTime = Math.abs(new Date() - new Date(earnedDay)); //differenza di giorni tra il giorno corrente e il giorno dell'ultimo ritiro
   const diffDays = parseInt(Math.ceil(diffTime / (1000 * 60 * 60 * 24))); //converto la differnza in giorni
 
-  
-  const eurSpesi = 1400 * 4
-  const eurRitirati = (536) * 4 + totalEurDailyIncome * diffDays // calcolo se ritirassi adesso i soldi in sospeso dall'ultimo ritiro
-  
-  const roi = parseInt((eurSpesi - eurRitirati) / totalEurDailyIncome)
+
+  const eurSpesi = 1400 * 4 //totale investimento
+  const eurRitirati = (536) * 4
+  const eurProntiRitiro = totalEurDailyIncome * diffDays
+  const eurPrevisione = eurRitirati + eurProntiRitiro // calcolo se ritirassi adesso i soldi in sospeso dall'ultimo ritiro
+  const eurPercRitirati = customRound((eurPrevisione / eurSpesi) * 100)
+
+  const roi = parseInt((eurSpesi - eurPrevisione) / totalEurDailyIncome)
   const roiDate = new Date(new Date().setDate(new Date().getDate() + roi))
   const roiDateFormat = roiDate.toLocaleDateString("it");
 
@@ -383,15 +386,26 @@ const App = () => {
         <Card className="mx-auto m-4">
           <Card.Header as="h5">Real time converter</Card.Header>
           <Card.Body>
-              <small>
-                ROI = {roi} giorni --> {roiDateFormat}
-              </small>
             <Card.Title className="mb-3">
               <small>
                 Earning {dailyIncome["green-satoshi-token"]}GST + {dailyIncome["green-satoshi-token-bsc"]}GST(BSC) = {customRound(totalEurDailyIncome)}€
               </small>
             </Card.Title>
 
+            <small>
+              ROI = {roi} days ({roiDateFormat}) - earned <b>{parseInt(eurPrevisione/4)}€</b> each
+            </small>
+            <ProgressBar min={0} animated now={eurPrevisione} max={eurSpesi} label={parseInt(eurPrevisione)+'€ - '+eurPercRitirati+'%'}/>
+            <div>
+            <small className="float-left">
+              {0}€
+            </small>
+            <small className="float-end">
+              {eurSpesi}€
+            </small>
+            </div>
+
+            <hr />
             <Row xs={1} lg={3} className='mt-4'>
               {
                 cryptoIdList.slice(0, 3).map((value, index) => {
