@@ -393,7 +393,7 @@ const App = () => {
             </Card.Title>
 
             <small>
-              ROI = {roi} days ({roiDateFormat}) - earned <b>{parseInt(eurPrevisione/4)}€</b> each
+              ROI = {roi} days ({roiDateFormat}) - earned {parseInt(eurPrevisione/4)}€ each
             </small>
             <ProgressBar min={0} animated now={eurPrevisione} max={eurSpesi} label={parseInt(eurPrevisione)+'€ - '+eurPercRitirati+'%'}/>
             <div>
