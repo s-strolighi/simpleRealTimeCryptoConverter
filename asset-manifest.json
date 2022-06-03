@@ -1,14 +1,14 @@
 {
   "files": {
     "main.css": "/stepnHelper/static/css/main.290365a3.css",
-    "main.js": "/stepnHelper/static/js/main.897a7da9.js",
+    "main.js": "/stepnHelper/static/js/main.24b981be.js",
     "static/media/logo512.png": "/stepnHelper/static/media/logo512.486e30cfdac6eb68d6f0.png",
     "index.html": "/stepnHelper/index.html",
     "main.290365a3.css.map": "/stepnHelper/static/css/main.290365a3.css.map",
-    "main.897a7da9.js.map": "/stepnHelper/static/js/main.897a7da9.js.map"
+    "main.24b981be.js.map": "/stepnHelper/static/js/main.24b981be.js.map"
   },
   "entrypoints": [
     "static/css/main.290365a3.css",
-    "static/js/main.897a7da9.js"
+    "static/js/main.24b981be.js"
   ]
 }
