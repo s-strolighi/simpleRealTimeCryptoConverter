@@ -13,13 +13,13 @@ const App = () => {
 
   const [totalEurDailyIncome, setTotalEurDailyIncome] = useState(0)
 
-  const earnedDay = '05/30/2022' // MM/DD/YYY
+  const earnedDay = '06/03/2022' // MM/DD/YYY
   const diffTime = Math.abs(new Date() - new Date(earnedDay)); //differenza di giorni tra il giorno corrente e il giorno dell'ultimo ritiro
   const diffDays = parseInt(Math.ceil(diffTime / (1000 * 60 * 60 * 24))); //converto la differnza in giorni
 
 
   const eurSpesi = 1400 * 4 //totale investimento
-  const eurRitirati = (536) * 4
+  const eurRitirati = (536 + 72) * 4
   const eurProntiRitiro = totalEurDailyIncome * diffDays
   const eurPrevisione = eurRitirati + eurProntiRitiro // calcolo se ritirassi adesso i soldi in sospeso dall'ultimo ritiro
   const eurPercRitirati = customRound((eurPrevisione / eurSpesi) * 100)
