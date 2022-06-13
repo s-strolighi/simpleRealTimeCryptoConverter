@@ -10,6 +10,8 @@ const App = () => {
     'green-satoshi-token-bsc': 19
   }
 
+  const mintBaseGst = 360
+  const mintBaseGmt = 40
 
   const [totalEurDailyIncome, setTotalEurDailyIncome] = useState(0)
 
@@ -48,15 +50,6 @@ const App = () => {
   });
   const [usdEurRateo, setUsdEurRateo] = useState(0)
 
-  const [allValues, setAllValues] = useState({})
-  const [mintValues, setMintValues] = useState({
-    "200/0": { "eur": 0, "sol": 0 },
-    "160/40": { "eur": 0, "sol": 0 },
-    "120/80": { "eur": 0, "sol": 0 },
-    "100/100": { "eur": 0, "sol": 0 },
-    "80/120": { "eur": 0, "sol": 0 },
-    "40/160": { "eur": 0, "sol": 0 }
-  })
   const levelCumulativeCost = {
     0: { gst: 0, gmt: 0 },
     1: { gst: 1, gmt: 0 },
@@ -92,7 +85,8 @@ const App = () => {
   }
 
   const updatePeriodicallySymbolsValues = () => {
-    setInterval(updateSymbolsValues, apiRefreshTimer * 1000)
+    //setInterval(updateSymbolsValues, apiRefreshTimer * 1000)
+    updateSymbolsValues()
   }
 
   const updateSymbolsValues = (init = false) => {
@@ -114,7 +108,6 @@ const App = () => {
         if (init) {
           let totalEurDailyIncome = symbolsValueUpdated['green-satoshi-token'].eur * dailyIncome['green-satoshi-token'] + symbolsValueUpdated['green-satoshi-token-bsc'].eur * dailyIncome['green-satoshi-token-bsc']
           setTotalEurDailyIncome(totalEurDailyIncome)
-          handleChangeText('solana', (totalEurDailyIncome / symbolsValueUpdated['solana'].eur));
         }
       }
     })
@@ -136,103 +129,177 @@ const App = () => {
       });
   }
 
-  const handleChangeText = (symbol, amount) => {
-    let allValuesUpdated = { ...allValues };
-    allValuesUpdated[symbol] = amount;
-    let done;
-
-    if (cryptoIdList.includes(symbol)) {
-      done = cryptoIdList.every(key => {
-        if (key !== symbol)
-          allValuesUpdated[key] = (symbolsValue[symbol].eur / symbolsValue[key].eur) * parseFloat(amount)
-
-        return true;
-      })
-
-      if (done) {
-        allValuesUpdated.eur = symbolsValue[symbol].eur * parseFloat(amount)
-        allValuesUpdated.usd = symbolsValue[symbol].usd * parseFloat(amount)
-      }
-    }
-    else {
-      done = cryptoIdList.every(key => {
-        allValuesUpdated[key] = parseFloat(amount) / symbolsValue[key][symbol]
-        return true;
-      })
-      if (done) {
-        if (symbol === 'eur') {
-          allValuesUpdated.eur = parseFloat(amount)
-          allValuesUpdated.usd = parseFloat(amount) * usdEurRateo
-        }
-        else if (symbol === 'usd') {
-          allValuesUpdated.eur = parseFloat(amount) / usdEurRateo
-          allValuesUpdated.usd = parseFloat(amount)
-        }
-      }
-    }
-    if (done)
-      setAllValues(allValuesUpdated)
-  }
-
   const updateMintStats = () => {
-    let mintValuesUpdated = mintValues;
-
-    let done = Object.keys(mintValues).every(value => {
-      let key = value
-      let gstAmount = parseInt(value.split("/")[0].trim())
-      let gmtAmount = parseInt(value.split("/")[1].trim())
-
-      mintValuesUpdated[key].eur = symbolsValue["green-satoshi-token"].eur * gstAmount + symbolsValue["stepn"].eur * gmtAmount
-      mintValuesUpdated[key].sol = mintValuesUpdated[key].eur / symbolsValue["solana"].eur
-
-      return true
-    })
-
-    if (done) {
-      setMintValues(mintValuesUpdated)
       setCurrentGstUsdPrice(symbolsValue["green-satoshi-token"].usd)
-    }
-
   }
 
   function customRound(value) {
     return Math.round((value + Number.EPSILON) * 100) / 100
   }
 
+
+  //Component card converter
+  const  CardConverter = () => {
+
+    const [allValues, setAllValues] = useState({})
+
+    const handleChangeText = (symbol, amount) => {
+      let allValuesUpdated = { ...allValues };
+      allValuesUpdated[symbol] = amount;
+      let done;
+  
+      if (cryptoIdList.includes(symbol)) {
+        done = cryptoIdList.every(key => {
+          if (key !== symbol)
+            allValuesUpdated[key] = (symbolsValue[symbol].eur / symbolsValue[key].eur) * parseFloat(amount)
+  
+          return true;
+        })
+  
+        if (done) {
+          allValuesUpdated.eur = symbolsValue[symbol].eur * parseFloat(amount)
+          allValuesUpdated.usd = symbolsValue[symbol].usd * parseFloat(amount)
+        }
+      }
+      else {
+        done = cryptoIdList.every(key => {
+          allValuesUpdated[key] = parseFloat(amount) / symbolsValue[key][symbol]
+          return true;
+        })
+        if (done) {
+          if (symbol === 'eur') {
+            allValuesUpdated.eur = parseFloat(amount)
+            allValuesUpdated.usd = parseFloat(amount) * usdEurRateo
+          }
+          else if (symbol === 'usd') {
+            allValuesUpdated.eur = parseFloat(amount) / usdEurRateo
+            allValuesUpdated.usd = parseFloat(amount)
+          }
+        }
+      }
+      if (done)
+        setAllValues(allValuesUpdated)
+    }
+  
+    useEffect(() => {
+      handleChangeText('solana', (totalEurDailyIncome / symbolsValue['solana'].eur))
+    }, [totalEurDailyIncome])
+
+    return <Card className="mx-auto m-4">
+    <Card.Header as="h5">Real time converter</Card.Header>
+    <Card.Body>
+      <Card.Title className="mb-3">
+        <small>
+          Earning {dailyIncome["green-satoshi-token"]}GST + {dailyIncome["green-satoshi-token-bsc"]}GST(BSC) = {customRound(totalEurDailyIncome)}€
+        </small>
+      </Card.Title>
+
+      <small>
+        ROI = {roi} days ({roiDateFormat}) - earned {parseInt(eurPrevisione/4)}€ each
+      </small>
+      <ProgressBar min={0} animated now={eurPrevisione} max={eurSpesi} label={parseInt(eurPrevisione)+'€ - '+eurPercRitirati+'%'}/>
+      <div>
+      <small className="float-left">
+        {0}€
+      </small>
+      <small className="float-end">
+        {eurSpesi}€
+      </small>
+      </div>
+
+      <hr />
+      <Row xs={1} lg={3} className='mt-4'>
+        {
+          cryptoIdList.slice(0, 3).map((value, index) => {
+            return <Col key={'crypto' + index} className="mb-3">
+              <InputGroup>
+                <Button variant="outline-primary" onClick={(e) => handleChangeText(value,1)}>{symbols[value]}</Button>
+                <FormControl type='text' placeholder="insert" value={allValues[value] || ''} inputMode='decimal' onChange={(e) => handleChangeText(value, e.target.value?.replace(',', '.'))} />
+              </InputGroup>
+            </Col>
+          })
+        }
+      </Row>
+      <hr />
+      <Row xs={1} lg={2}>
+        {
+          cryptoIdList.slice(3, 5).map((value, index) => {
+            return <Col key={'crypto' + index} className="mb-3">
+              <InputGroup>
+                <Button variant="outline-primary" onClick={(e) => handleChangeText(value,1)}>{symbols[value]}</Button>
+                <FormControl type='text' placeholder="insert" value={allValues[value] || ''} inputMode='decimal' onChange={(e) => handleChangeText(value, e.target.value?.replace(',', '.'))} />
+              </InputGroup>
+            </Col>
+          })
+        }
+      </Row>
+      <hr />
+      <Row xs={1} lg={2}>
+        {
+          fiatIdList.map((value, index) => {
+            return <Col key={'fiat' + index} className=" mb-3">
+              <InputGroup>
+                <Button variant="outline-primary" onClick={(e) => handleChangeText(value,1)}>{value.toUpperCase()}</Button>
+                <FormControl placeholder="insert" value={allValues[value] || ''} onChange={(e) => handleChangeText(value, e.target.value)} />
+              </InputGroup>
+            </Col>
+          })
+        }
+      </Row>
+    </Card.Body>
+  </Card>
+  }
+
+
+  //Component card minting
   function CardMinting() {
     let mintKey;
     let message;
     let price = currentGstUsdPrice;
+    let multiplier;
     switch (true) {
-      case (price < 2):
-        mintKey = currentMintKey || "200/0"
-        message = "GST lower than 2 USD"
-        break;
-      case (price < 3):
-        mintKey = currentMintKey || "160/40"
-        message = "GST between 2 and 3 USD"
-        break;
       case (price < 4):
-        mintKey = currentMintKey || "120/80"
-        message = "GST between 3 and 4 USD"
+        multiplier = 0
+        message = 'GST lower than 4 USD'
         break;
       case (price < 8):
-        mintKey = currentMintKey || "100/100"
-        message = "GST between 4 and 8 USD"
+        multiplier = 0.5
+        message = 'GST between 4 and 8 USD'
         break;
-      case (price < 10):
-        mintKey = currentMintKey || "80/120"
-        message = "GST between 8 and 10 USD"
+      case (price < 12):
+        multiplier = 1
+        message = 'GST between 8 and 12 USD'
         break;
-      case (price >= 10):
-        mintKey = currentMintKey || "40/160"
-        message = "GST higher than 10 USD"
+      case (price < 16):
+        multiplier = 2
+        message = 'GST between 12 and 16 USD'
+        break;
+      case (price < 20):
+        multiplier = 4
+        message = 'GST between 16 and 20 USD'
+        break;
+      case (price < 30):
+        multiplier = 8
+        message = 'GST between 20 and 30 USD'
+        break;
+      case (price < 40):
+        multiplier = 16
+        message = 'GST between 30 and 40 USD'
+        break;
+      case (price < 50):
+        multiplier = 32
+        message = 'GST between 40 and 50 USD'
+        break;
+      case (price >= 50):
+        multiplier = 64
+        message = 'GST higher than 50 USD'
         break;
       default:
         mintKey = currentMintKey || null
         break;
     }
 
+    mintKey = currentMintKey || `${mintBaseGst}/${mintBaseGmt+((mintBaseGst+mintBaseGmt)*0)}`
     const [customGstAmount, setCustomGstAmount] = useState(null)
     const [customGmtAmount, setCustomGmtAmount] = useState(null)
     const [customLevelActive, setCustomLevelActive] = useState(false)
@@ -278,12 +345,7 @@ const App = () => {
           </div>
           <div className="col col-lg-4">
             <DropdownButton title={gstAmount + "GST+" + gmtAmount + "GMT"} size="sm">
-              <Dropdown.Item as="button" onClick={() => setCurrentMintKey("200/0")}><b>{200}</b>GST+<b>{0}</b>GMT {"(GST < 2$)"}</Dropdown.Item>
-              <Dropdown.Item as="button" onClick={() => setCurrentMintKey("160/40")}><b>{160}</b>GST+<b>{40}</b>GMT {"(GST 2-3$)"}</Dropdown.Item>
-              <Dropdown.Item as="button" onClick={() => setCurrentMintKey("120/80")}><b>{120}</b>GST+<b>{80}</b>GMT {"(GST 3-4$)"}</Dropdown.Item>
-              <Dropdown.Item as="button" onClick={() => setCurrentMintKey("100/100")}><b>{100}</b>GST+<b>{100}</b>GMT {"(GST 4-8$)"}</Dropdown.Item>
-              <Dropdown.Item as="button" onClick={() => setCurrentMintKey("80/120")}><b>{80}</b>GST+<b>{120}</b>GMT {"(GST 8-10$)"}</Dropdown.Item>
-              <Dropdown.Item as="button" onClick={() => setCurrentMintKey("40/160")}><b>{40}</b>GST+<b>{160}</b>GMT {"(GST > 10$)"}</Dropdown.Item>
+              <Dropdown.Item as="button" onClick={() => setCurrentMintKey("360/40")}><b>{360}</b>GST+<b>{40}</b>GMT {"(GST < 4$)"}</Dropdown.Item>
               <Dropdown.Divider />
               <Dropdown.Item as="button" onClick={() => setCurrentMintKey("customMintKey")}><b>Custom GST/GMT</b></Dropdown.Item>
 
@@ -360,8 +422,8 @@ const App = () => {
     </Card>
   }
 
-  useEffect(() => {
 
+  useEffect(() => {
     updateSymbolsValues(true)
     updatePeriodicallySymbolsValues();
   }, [])
@@ -383,69 +445,7 @@ const App = () => {
     </Navbar>
     <div className="mx-auto row mainContainer">
       <div className="col-lg">
-        <Card className="mx-auto m-4">
-          <Card.Header as="h5">Real time converter</Card.Header>
-          <Card.Body>
-            <Card.Title className="mb-3">
-              <small>
-                Earning {dailyIncome["green-satoshi-token"]}GST + {dailyIncome["green-satoshi-token-bsc"]}GST(BSC) = {customRound(totalEurDailyIncome)}€
-              </small>
-            </Card.Title>
-
-            <small>
-              ROI = {roi} days ({roiDateFormat}) - earned {parseInt(eurPrevisione/4)}€ each
-            </small>
-            <ProgressBar min={0} animated now={eurPrevisione} max={eurSpesi} label={parseInt(eurPrevisione)+'€ - '+eurPercRitirati+'%'}/>
-            <div>
-            <small className="float-left">
-              {0}€
-            </small>
-            <small className="float-end">
-              {eurSpesi}€
-            </small>
-            </div>
-
-            <hr />
-            <Row xs={1} lg={3} className='mt-4'>
-              {
-                cryptoIdList.slice(0, 3).map((value, index) => {
-                  return <Col key={'crypto' + index} className="mb-3">
-                    <InputGroup>
-                      <Button variant="outline-primary">{symbols[value]}</Button>
-                      <FormControl type='text' placeholder="insert" value={allValues[value] || ''} inputMode='decimal' onChange={(e) => handleChangeText(value, e.target.value?.replace(',', '.'))} />
-                    </InputGroup>
-                  </Col>
-                })
-              }
-            </Row>
-            <hr />
-            <Row xs={1} lg={2}>
-              {
-                cryptoIdList.slice(3, 5).map((value, index) => {
-                  return <Col key={'crypto' + index} className="mb-3">
-                    <InputGroup>
-                      <Button variant="outline-primary">{symbols[value]}</Button>
-                      <FormControl type='text' placeholder="insert" value={allValues[value] || ''} inputMode='decimal' onChange={(e) => handleChangeText(value, e.target.value?.replace(',', '.'))} />
-                    </InputGroup>
-                  </Col>
-                })
-              }
-            </Row>
-            <hr />
-            <Row xs={1} lg={2}>
-              {
-                fiatIdList.map((value, index) => {
-                  return <Col key={'fiat' + index} className=" mb-3">
-                    <InputGroup>
-                      <Button variant="outline-primary">{value.toUpperCase()}</Button>
-                      <FormControl placeholder="insert" value={allValues[value] || ''} onChange={(e) => handleChangeText(value, e.target.value)} />
-                    </InputGroup>
-                  </Col>
-                })
-              }
-            </Row>
-          </Card.Body>
-        </Card>
+        <CardConverter />
       </div>
       <div className="col-lg">
         <CardMinting />
